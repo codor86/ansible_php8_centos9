@@ -1,0 +1,33 @@
+---
+# https://www.percona.com/downloads/Percona-Server-8.0/Percona-Server-8.0.30-22/binary/redhat/9/
+
+# Clean this up for usage with older versions of centos or when percona is released for 9
+#- name: (DB) Install the Percona Repository
+#  when: ansible_facts.os_family == 'RedHat'
+#  ansible.builtin.yum_repository:
+#    name: percona
+#    description: Install the Percona Repository
+#    baseurl: https://repo.percona.com/yum/percona-release-latest.noarch.rpm
+#
+#- name: (DB) Install Percona packages
+#  yum: name=percona-server-server state=latest
+#  when: ansible_facts.os_family == 'RedHat'
+
+#- name: (DB) Download Percona Server for MYSQL 8.0 on RedHat 9
+#  become: yes
+#  shell: |
+#    wget -O percona.tar https://downloads.percona.com/downloads/Percona-Server-8.0/Percona-Server-8.0.30-22/binary/redhat/9/x86_64/Percona-Server-8.0.30-22-r7e301439b65-el9-x86_64-bundle.tar
+#    tar -xvf percona.tar
+
+- name: (DB) Install MySQL 8
+  yum: name="mysql, mysql-server" state=latest
+  when: ansible_facts.os_family == 'RedHat'
+  become: yes
+  tags:
+    - mysql
+
+- name: (DB) Add MySQL config
+  template: src="mysql-server.cnf" dest="/etc/my.cnf.d/mysql-server.cnf"
+  become: yes
+  notify:
+    - Reload mysql

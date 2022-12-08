@@ -1,0 +1,7 @@
+admins:
+  - login: <>
+    name: <>
+    password: # generate password openssl passwd -salt <salt> -1 <plaintext>
+    key: <pubkey>
+
+app_user: production

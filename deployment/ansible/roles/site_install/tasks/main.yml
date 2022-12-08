@@ -1,0 +1,6 @@
+---
+- name: (Web) Nginx configuration
+  template: src="example.conf" dest="/etc/nginx/conf.d/example.conf"
+  become: yes
+  notify:
+    - Reload nginx

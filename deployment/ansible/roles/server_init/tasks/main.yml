@@ -1,0 +1,56 @@
+---
+- name: (All) Show facts available on server
+  ansible.builtin.debug:
+    var: ansible_facts
+
+- name: (Centos) Update Packages
+  yum: name=* state=latest
+  when: ansible_facts.os_family == 'RedHat'
+  tags:
+    - update_packages
+
+# generate password openssl passwd -salt <salt> -1 <plaintext>
+- name: (All) Add admin users
+  user: comment="{{ item.name }}" groups=wheel home="/home/{{ item.login }}" name="{{ item.login }}" shell=/bin/bash password="{{ item.password }}"
+  become: yes
+  with_items: "{{ admins|default([]) }}"
+  tags:
+    - add_users
+    - update_users
+
+- name: (All) Add admin ssh keys
+  authorized_key: user={{ item.login }} key="{{ lookup('file', inventory_dir + '/../keys/' + item.key) }}"
+  become: yes
+  with_items: "{{ admins|default([]) }}"
+  tags:
+    - add_users
+    - update_users
+
+- name: (All) Remove old admin users
+  user: name={{ item }} state=absent remove=yes
+  become: yes
+  with_items: "{{ old_users|default([]) }}"
+  tags:
+    - remove_users
+    - update_users
+
+- name: (All) Set timezone to UTC
+  become: yes
+  timezone:
+    name: UTC
+  tags:
+    - timezone
+
+- name: (All) Set hostname
+  become: yes
+  hostname:
+    name: "{{ inventory_hostname }}"
+  tags:
+    -hostname
+
+- name: (All) Update Hosts
+  copy: src=hosts dest=/etc/hosts
+  become: yes
+  tags:
+    - hosts
+

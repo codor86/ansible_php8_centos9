@@ -1,0 +1,9 @@
+- name: Execute initial server setup tasks
+  hosts: prod
+  roles:
+    - server_init
+    - { role: mysql, become: yes, tags: mysql, hosts: db}
+    - { role: php, become: yes, tags: php, hosts: web }
+    - { role: certificate, become:yes, tags: certificate, hosts: web }
+    - { role: nginx, become: yes, tags: nginx, hosts: web }
+    - { role: site_install, become: yes, tags: site_install, hosts: web }

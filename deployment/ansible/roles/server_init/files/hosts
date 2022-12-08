@@ -1,0 +1,4 @@
+127.0.0.1 default localhost
+
+#web servers
+<< ip address >> web1

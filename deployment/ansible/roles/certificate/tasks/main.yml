@@ -1,0 +1,23 @@
+---
+- name: (Web) Install python cryptography
+  shell: |
+    yes | dnf install python3-pip
+    pip install cryptography
+
+- name: Create private key (RSA, 4096 bits)
+  community.crypto.openssl_privatekey:
+    path: /etc/ssl/certs/openssl.key
+
+- name: Create CSR for self signed certificate
+  community.crypto.openssl_csr_pipe:
+    privatekey_path: /etc/ssl/certs/openssl.key
+    common_name: example.com
+    organization_name: Example, Com.
+  register: csr
+
+- name: Create self-signed certificate from CSR
+  community.crypto.x509_certificate:
+    path: /etc/ssl/certs/self.crt
+    csr_content: "{{ csr.csr }}"
+    privatekey_path: /etc/ssl/certs/openssl.key
+    provider: selfsigned

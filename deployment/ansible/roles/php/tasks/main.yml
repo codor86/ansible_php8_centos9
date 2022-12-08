@@ -1,0 +1,32 @@
+---
+- name: (Web) DNF Upgrade all packages Centos 9
+  ansible.builtin.dnf:
+    name: '*'
+    state: latest
+
+- name: (Web) Prep dnf to install PHP 8
+  become: yes
+  shell: |
+    sudo dnf config-manager --set-enabled crb
+    yes | sudo dnf install \
+        https://dl.fedoraproject.org/pub/epel/epel-release-latest-9.noarch.rpm \
+        https://dl.fedoraproject.org/pub/epel/epel-next-release-latest-9.noarch.rpm
+    sudo dnf install dnf-utils http://rpms.remirepo.net/enterprise/remi-release-9.rpm -y
+    sudo dnf update --refresh -y
+
+- name: (Web) Enable PHP8 repo
+  become: yes
+  shell: |
+    sudo dnf module enable php:remi-8.0 -y
+
+- name: (Web) Install php-fpm
+  become: yes
+  shell: |
+    sudo dnf install php-fpm -y
+
+- name: (Web) Add application user
+  user: name={{ app_user }} state=present shell=/bin/bash
+
+- name: Add admin keys to app user
+  authorized_key: user={{ app_user }} key="{{lookup('file', inventory_dir + '/../keys/' + item.key)}}"
+  with_items: "{{ admins|default([]) }}"
