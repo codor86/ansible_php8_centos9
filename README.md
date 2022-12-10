@@ -8,7 +8,7 @@ This is intended to whip up a dev php stack on Centos 9
 - Install nginx, default config that has no server blocks
 - Installs nginx conf for example site, https only redirect to https
 
-Example usage: ansible-playbook -i ansible/hosts/dev ansible/playbooks/site.yml
+Example usage: ansible-playbook -i ansible/hosts/dev ansible/site.yml
 
 Files to modify for project
 
